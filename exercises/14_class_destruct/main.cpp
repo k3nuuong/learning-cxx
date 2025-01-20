@@ -12,7 +12,7 @@ class DynFibonacci {
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cached(0) {
+    DynFibonacci(int capacity): capacity(capacity), cached(-1) {
         if (capacity < 1) {
             cache = nullptr;
             return;
