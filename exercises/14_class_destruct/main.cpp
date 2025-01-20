@@ -7,20 +7,43 @@
 /// @details 可以在构造时传入缓存容量，因此需要动态分配缓存空间。
 class DynFibonacci {
     size_t *cache;
+    int capacity;
     int cached;
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity): cached(0) {
+        if (capacity < 1) {
+            cache = nullptr;
+            return;
+        }
+        cache = new size_t[capacity];
+        cache[0] = 0;
+        if (capacity >= 1) {
+            cache[0] = 0;
+            cached = 0;
+        }
+        if (capacity >= 2)
+        {
+            cache[1] = 1;
+            cached = 1;
+        }
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci() {
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t get(int i) {
-        for (; false; ++cached) {
-            cache[cached] = cache[cached - 1] + cache[cached - 2];
+        if (i == 0 || i == 1 || cached >= i) return cache[i];
+        for (int j = cached + 1; j <= i; ++j) {
+            if (j - 1 >= 0 && j - 2 >= 0)
+                cache[j] = cache[j - 1] + cache[j - 2];
+            else cache[j] = 0;
         }
+        cached = i;
         return cache[i];
     }
 };

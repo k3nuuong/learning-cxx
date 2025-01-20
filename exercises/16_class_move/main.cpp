@@ -11,26 +11,66 @@
 
 class DynFibonacci {
     size_t *cache;
+    int capacity;
     int cached;
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity): cache(new size_t[capacity]), capacity(capacity), cached(-1) {
+        if (capacity < 1) {
+            delete[] cache;
+            cache = nullptr;
+            capacity =0;
+        } else {
+            cache[0] = 0;
+            cached = 0;
+            if (capacity >= 2) {
+                cache[1] = 1;
+                cached = 1;
+            }
+        }
+    }
 
     // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci &&) noexcept = delete;
+    DynFibonacci(DynFibonacci &&other) noexcept : cache(other.cache), capacity(other.capacity), cached(other.cached) {
+        other.cache = nullptr;
+        other.capacity = 0;
+        other.cached = -1;
+    }
 
     // TODO: 实现移动赋值
     // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci &&) noexcept = delete;
+    DynFibonacci &operator=(DynFibonacci &&other) noexcept {
+        if (this != &other) {
+            delete[] cache;
+            cache = other.cache;
+            capacity = other.capacity;
+            cached = other.cached;
+            other.cache = nullptr;
+            other.capacity = 0;
+            other.cached = -1;
+        }
+        return *this;
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci() {
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
-        for (; false; ++cached) {
-            cache[cached] = cache[cached - 1] + cache[cached - 2];
+        if (i > cached) {
+            for (int j = cached + 1; j <= i; ++j) {
+                if (j - 1 >= 0 && j - 2 >= 0) {
+                    cache[j] = cache[j - 1] + cache[j - 2];
+                } else if (j - 1 >= 0) {
+                    cache[j] = cache[j - 1];
+                } else {
+                    cache[j] = 0;
+                }
+            }
+            cached = i;
         }
         return cache[i];
     }

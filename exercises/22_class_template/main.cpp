@@ -1,4 +1,5 @@
 ﻿#include "../exercise.h"
+#include <cstring>
 
 // READ: 类模板 <https://zh.cppreference.com/w/cpp/language/class_template>
 
@@ -10,6 +11,10 @@ struct Tensor4D {
     Tensor4D(unsigned int const shape_[4], T const *data_) {
         unsigned int size = 1;
         // TODO: 填入正确的 shape 并计算 size
+        for (int i = 0; i < 4; ++i)
+            shape[i] = shape_[i];
+
+        size = shape[0] * shape[1] * shape[2] * shape[3];
         data = new T[size];
         std::memcpy(data, data_, size * sizeof(T));
     }
@@ -28,6 +33,33 @@ struct Tensor4D {
     // 则 `this` 与 `others` 相加时，3 个形状为 `[1, 2, 1, 4]` 的子张量各自与 `others` 对应项相加。
     Tensor4D &operator+=(Tensor4D const &others) {
         // TODO: 实现单向广播的加法
+        for (unsigned int i0 = 0; i0 < shape[0]; ++i0) {
+            for (unsigned int i1 = 0; i1 < shape[1]; ++i1) {
+                for (unsigned int i2 = 0; i2 < shape[2]; ++i2) {
+                    for (unsigned int i3 = 0; i3 < shape[3]; ++i3) {
+                        
+                        const unsigned int idx = 
+                            i0 * (shape[1] * shape[2] * shape[3]) +
+                            i1 * (shape[2] * shape[3]) +
+                            i2 * shape[3] +
+                            i3;
+
+                        const unsigned int j0 = others.shape[0] == 1 ? 0 : i0;
+                        const unsigned int j1 = others.shape[1] == 1 ? 0 : i1;
+                        const unsigned int j2 = others.shape[2] == 1 ? 0 : i2;
+                        const unsigned int j3 = others.shape[3] == 1 ? 0 : i3;
+
+                        const unsigned int other_idx = 
+                            j0 * (others.shape[1] * others.shape[2] * others.shape[3]) +
+                            j1 * (others.shape[2] * others.shape[3]) +
+                            j2 * others.shape[3] +
+                            j3;
+
+                        data[idx] += others.data[other_idx];
+                    }
+                }
+            }
+        }
         return *this;
     }
 };
